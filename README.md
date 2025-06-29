@@ -32,30 +32,29 @@ Mock backend API simulating async CRUD
 
 Project Structure:
 
-├── src/
-│   ├── pages/
-│   │   └── inventory.tsx
-│   ├── components/
-│   │   ├── InventoryForm.tsx
-│   │   └── InventoryTable.tsx
-│   ├── context/
-│   │   └── InventoryContext.tsx
-│   ├── api/
-│   │   └── mockApi.ts
-│   ├── hooks/
-│   │   └── useInventory.ts
-│   ├── styles/
-│       └── globals.css
-├── db.json                     # Mock API data
-├── tailwind.config.js
-├── tsconfig.json
-├── package.json
+-src/
+-app/
+ -page.tsx
+ -layout.tsx
+ -components/
+   -FormSection.tsx
+   -InventoryTable.tsx
+   -ContextProvider.tsx
+   -Sidebar.tsx
+ -lib/
+   -api.ts
+ -styles/
+   -globals.css
+-db.json                     # Mock API data
+-tailwind.config.js
+-tsconfig.json
+-package.json
 
 
  Setup & Run:
 1.Clone Repository & Install Dependencies
 
-git clone <repo-url>
+git clone https://github.com/Nithupm/inventoryl
 cd inventory
 npm install
 
