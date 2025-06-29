@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Task:  Add Inventory Page - 1Box Tickets
+Tech Stack: Next.js, TypeScript, Tailwind CSS, React Query, Context API, JSON Server (mock API)
 
-## Getting Started
+Table of Contents:
 
-First, run the development server:
+1.Features
+2.Project Structure
+3.Setup & Run
+4.Approach & Decisions
+5.Assumptions
+6.Tech Choices
+7.Future Improvements
 
-```bash
+Features:
+
+-Fully responsive Add Inventory UI (Desktop + Tablet)
+
+-Controlled form fields with required validation
+
+-Dynamic + Add Listing functionality
+
+Table supports:
+
+-Select
+-Edit
+-Delete
+-Clone
+
+Batch actions: Select All, Deselect All, Delete
+
+Mock backend API simulating async CRUD
+
+Project Structure:
+
+├── src/
+│   ├── pages/
+│   │   └── inventory.tsx
+│   ├── components/
+│   │   ├── InventoryForm.tsx
+│   │   └── InventoryTable.tsx
+│   ├── context/
+│   │   └── InventoryContext.tsx
+│   ├── api/
+│   │   └── mockApi.ts
+│   ├── hooks/
+│   │   └── useInventory.ts
+│   ├── styles/
+│       └── globals.css
+├── db.json                     # Mock API data
+├── tailwind.config.js
+├── tsconfig.json
+├── package.json
+
+
+ Setup & Run:
+1.Clone Repository & Install Dependencies
+
+git clone <repo-url>
+cd inventory
+npm install
+
+2.Install JSON Server (Mock API)
+npm install -g json-server
+
+3.Start the Mock API Server
+
+json-server --watch db.json --port 4000
+Your mock API will run at: http://localhost:4000
+
+4.Start the Next.js Development
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Open http://localhost:3000 to view it in the browser.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Approach & Decisions:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+UI: TailwindCSS used for utility-based responsive design
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Form: Controlled inputs with simple validation for required fields
 
-## Learn More
+State Management: Context API for global state, React Query for API data
 
-To learn more about Next.js, take a look at the following resources:
+Mock API: JSON Server simulates network CRUD behavior
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Table logic: Controlled by local and global state. Optimized for editing and cloning.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Assumptions:
 
-## Deploy on Vercel
+The app only needs to simulate backend behavior using mock data
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Clone creates a duplicate with a new ID
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Basic HTML5 date input used
+
+Data is lost on page refresh (unless JSON server is extended with file-based persistence)
+
+Tech Choices:
+
+Next.js – Routing, SSR-friendly architecture
+
+Tailwind CSS – For styling and layout
+
+TypeScript – Type-safe development
+
+React Query – For async state and data caching
+
+Context API – Lightweight global state
+
+JSON Server – Mock backend for full CRUD
+
+Future Improvements:
+
+Add form field-level validation (number ranges, date rules)
+
+Include sorting & filtering options in the table
+
+Add persistent storage for mock API
+
+Integrate with a real backend
+
+Add unit and integration testing

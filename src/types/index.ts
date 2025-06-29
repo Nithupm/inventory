@@ -1,0 +1,24 @@
+export type Item = {
+  id: number;
+  eventId: string;
+  eventName?: string;
+  eventTime?: string;
+  venue?: string;
+  ticketType: string;
+  quantity: number;
+  splitType: string;
+  seatingArrangement: string;
+  maxDisplayQty: number;
+  fanArea: string;
+  category: string;
+  sectionBlock: string;
+  row: string;
+  seating: string;
+  faceValue: number;
+  payoutPrice: number;
+  benefits: string;
+  restrictions: string;
+  eventDate: string;
+  ticketsInHand: boolean;
+  uploadTickets: string; // file name only
+};
