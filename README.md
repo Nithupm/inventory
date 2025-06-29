@@ -68,7 +68,7 @@ Your mock API will run at: http://localhost:4000
 
 4.Start the Next.js Development
 npm run dev
-Open http://localhost:3000 to view it in the browser.
+Open localhost server to view it in the browser.
 
 Approach & Decisions:
 
@@ -88,7 +88,7 @@ The app only needs to simulate backend behavior using mock data
 
 Clone creates a duplicate with a new ID
 
-Basic HTML5 date input used
+addate input used
 
 Data is lost on page refresh (unless JSON server is extended with file-based persistence)
 
