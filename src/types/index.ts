@@ -3,6 +3,7 @@ export type Item = {
   eventId: string;
   eventName?: string;
   eventTime?: string;
+  eventDay?: string;
   venue?: string;
   ticketType: string;
   quantity: number;
@@ -20,5 +21,5 @@ export type Item = {
   restrictions: string;
   eventDate: string;
   ticketsInHand: boolean;
-  uploadTickets: string; // file name only
+  uploadTickets: string;
 };

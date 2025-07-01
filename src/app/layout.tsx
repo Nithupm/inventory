@@ -15,12 +15,7 @@ export default function RootLayout({
       <body className="min-h-screen">
         <QueryClientProvider client={queryClient}>
           <InventoryProvider>
-            {/* <div className="flex w-full">
-              <Sidebar />
-              <main className="flex-1 bg-gray-100 min-h-screen overflow-x-auto">
-                {children}
-              </main> */}
-            <div className="grid grid-cols-[90px_1fr] w-full h-screen">
+            <div className="grid grid-cols-[69px_1fr] w-full h-screen">
               <Sidebar />
               <main className="overflow-x-hidden overflow-y-auto bg-gray-100">
                 {children}

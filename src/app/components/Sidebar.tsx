@@ -21,7 +21,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-[90px] h-screen bg-blue-950 text-gray-200 flex flex-col">
+    <aside className="w-[70px] h-screen bg-[#15005E] text-gray-200 flex flex-col">
       <div className="flex items-center justify-center h-16 border-b border-gray-700">
         <span className="text-xl font-semibold">1Box</span>
       </div>
@@ -33,13 +33,13 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center px-3 py-2 rounded-md mb-2 transition-colors ${
+              className={`flex justify-center items-center h-12 rounded-md mb-2 transition-colors ${
                 active
-                  ? "bg-blue-400 text-white"
-                  : "hover:bg-blue-400 hover:text-white"
+                  ? "bg-[#00c2f4] text-white"
+                  : "hover:bg-[#00c2f4] hover:text-white"
               }`}
             >
-              <item.icon className="h-5 w-5 mr-3" />
+              <item.icon className="w-6 h-6 text-xl" />
             </Link>
           );
         })}

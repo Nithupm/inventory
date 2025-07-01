@@ -1,9 +1,17 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useContext, useEffect } from "react";
+import { InventoryContext } from "./ContextProvider";
 import { api } from "../../lib/api";
 import type { Item } from "../../types";
-import { FaUpload, FaComment } from "react-icons/fa";
+import {
+  FaUpload,
+  FaComment,
+  FaCalendar,
+  FaClock,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 import TextField from "@mui/material/TextField";
 import { Checkbox, FormControlLabel, MenuItem } from "@mui/material";
 
@@ -12,6 +20,7 @@ type FormInputs = {
   eventId: string;
   eventName?: string;
   eventTime?: string;
+  eventDay?: string;
   venue?: string;
   quantity: string;
   splitType: string;
@@ -32,27 +41,28 @@ type FormInputs = {
 };
 
 export default function FormSection() {
+  const { setActiveEventId } = useContext(InventoryContext)!;
   const events = [
     {
       id: "event1",
       name: "Concert A",
-      date: "2025-07-15",
-      time: "7:00 PM",
-      venue: "Stadium 1",
+      date: "Mon, 26th July 2024",
+      time: "19:00",
+      venue: "Stamford bridge, London, United Kingdom",
     },
     {
       id: "event2",
       name: "Concert B",
-      date: "2025-08-02",
-      time: "3:00 PM",
-      venue: "Arena 5",
+      date: "Sun, 26th Nov 2024",
+      time: "17:30",
+      venue: "Madison Square Garden, US",
     },
     {
       id: "event3",
       name: "Premier League",
-      date: "2025-08-02",
-      time: "3:00 PM",
-      venue: "Arena 5",
+      date: "Wed, 1st Jan 2025",
+      time: "18:45",
+      venue: "Long Beach Arena, LA",
     },
   ];
 
@@ -67,6 +77,7 @@ export default function FormSection() {
       eventId: "",
       eventName: "",
       eventTime: "",
+      eventDay: "",
       venue: "",
       ticketType: "",
       quantity: "",
@@ -87,24 +98,31 @@ export default function FormSection() {
       uploadTickets: undefined as unknown as FileList,
     },
   });
+
   const selectedEventId = watch("eventId");
   const selectedEvent = events.find((e) => e.id === selectedEventId);
 
-  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (selectedEventId) setActiveEventId(selectedEventId);
+  }, [selectedEventId, setActiveEventId]);
 
+  const queryClient = useQueryClient();
   const createItem = useMutation({
     mutationFn: (item: Omit<Item, "id">) => api.post("/inventory", item),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["inventory"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inventory"] });
+    },
   });
 
   const onSubmit = (data: FormInputs) => {
-    const selectedEvent = events.find((e) => e.id === data.eventId);
+    const sel = events.find((e) => e.id === data.eventId);
 
-    const payload = {
+    const payload: Omit<Item, "id"> = {
       ...data,
-      eventName: selectedEvent?.name || "",
-      eventTime: selectedEvent?.time || "",
-      venue: selectedEvent?.venue || "",
+      eventName: sel?.name || "",
+      eventTime: sel?.time || "",
+      venue: sel?.venue || "",
+      eventDay: sel?.date || "",
       quantity: Number(data.quantity),
       maxDisplayQty: Number(data.maxDisplayQty),
       payoutPrice: Number(data.payoutPrice),
@@ -114,28 +132,32 @@ export default function FormSection() {
 
     createItem.mutate(payload);
     reset();
+    setActiveEventId(data.eventId);
   };
 
   return (
     <div className="bg-white ">
       <div className="flex justify-between items-center p-5">
-        <h1 className="text-2xl font-semibold text-black">Add Inventory</h1>
+        <h1 className="text-lg md:text-2xl font-semibold text-black">
+          Add Inventory
+        </h1>
         <div className="flex items-center space-x-4">
-          <button className="border border-blue-800 rounded-md w-40 h-10 text-blue-700">
+          <button className="border border-blue-800 text-[14px] md:text-base rounded-md w-30 p-1.5 md:w-40 h-10 text-blue-700">
             Request Event
           </button>
-          <FaComment className="text-blue-400 text-xl" />
+          <FaComment className="text-[#00c2f4] text-xl" />
         </div>
       </div>
-      <hr className="bg-gray-300" />
+      <hr className="text-gray-300" />
       <form onSubmit={handleSubmit(onSubmit)} className="p-6 rounded shadow">
         <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 mb-6">
           <div className="lg:col-span-2">
             <TextField
               select
-              label="Select Event *"
+              label="Choose Match Event *"
               fullWidth
               size="small"
+              InputProps={{ sx: { fontSize: "14px" } }}
               variant="outlined"
               {...register("eventId", { required: "Event is required" })}
               error={!!errors.eventId}
@@ -151,41 +173,45 @@ export default function FormSection() {
             </TextField>
           </div>
 
-          {selectedEvent && (
+          {selectedEvent ? (
             <>
-              <div className="lg:col-span-2">
-                <TextField
-                  label="Date & Time"
-                  value={`${selectedEvent.date} at ${selectedEvent.time}`}
-                  fullWidth
-                  size="small"
-                  variant="outlined"
-                  InputProps={{ readOnly: true }}
-                  InputLabelProps={{ shrink: true }}
-                />
+              <div className="lg:col-span-1 flex gap-2 border-r border-gray-300 mt-2">
+                <FaCalendar className="mt-0.5 text-[#00c2f4]" />
+                <p className="text-sm text-gray-700">{selectedEvent.date}</p>
               </div>
-
-              <div className="lg:col-span-2">
-                <TextField
-                  label="Venue"
-                  value={selectedEvent.venue}
-                  fullWidth
-                  size="small"
-                  variant="outlined"
-                  InputProps={{ readOnly: true }}
-                  InputLabelProps={{ shrink: true }}
-                />
+              <div className="lg:col-span-1 flex gap-2 border-r border-gray-300 mt-2">
+                <FaClock className="mt-0.5 text-[#00c2f4]" />
+                <p className="text-sm text-gray-700">{selectedEvent.time}</p>
               </div>
+              <div className="lg:col-span-2 flex gap-2 mt-2">
+                <FaMapMarkerAlt className="mt-0.5 text-[#00c2f4]" />
+                <p className="text-sm text-gray-700">{selectedEvent.venue}</p>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="lg:col-span-1" />
+              <div className="lg:col-span-1" />
+              <div className="lg:col-span-2" />
             </>
           )}
 
-          <div>
+          <div className="lg:col-span-6">
+            <hr className="border-gray-300 my-2" />
+          </div>
+
+          <div className="mb-2">
             <TextField
               select
               label="Ticket Type*"
               variant="outlined"
               fullWidth
               size="small"
+              InputProps={{
+                sx: {
+                  fontSize: "14px",
+                },
+              }}
               {...register("ticketType", {
                 required: "Ticket type is required",
               })}
@@ -199,13 +225,18 @@ export default function FormSection() {
             </TextField>
           </div>
 
-          <div>
+          <div className="mb-2">
             <TextField
               select
               label="Quantity*"
               variant="outlined"
               fullWidth
               size="small"
+              InputProps={{
+                sx: {
+                  fontSize: "14px",
+                },
+              }}
               {...register("quantity", {
                 required: "quantity is required",
               })}
@@ -220,13 +251,18 @@ export default function FormSection() {
             </TextField>
           </div>
 
-          <div>
+          <div className="mb-2">
             <TextField
               select
               label="Split Type"
               variant="outlined"
               fullWidth
               size="small"
+              InputProps={{
+                sx: {
+                  fontSize: "14px",
+                },
+              }}
               {...register("splitType")}
               InputLabelProps={{ shrink: true }}
             >
@@ -236,13 +272,18 @@ export default function FormSection() {
             </TextField>
           </div>
 
-          <div>
+          <div className="mb-2">
             <TextField
               select
               label="Seating Arrangement*"
               variant="outlined"
               fullWidth
               size="small"
+              InputProps={{
+                sx: {
+                  fontSize: "14px",
+                },
+              }}
               {...register("seatingArrangement", {
                 required: "Seating Arrangement is required",
               })}
@@ -258,13 +299,18 @@ export default function FormSection() {
             </TextField>
           </div>
 
-          <div>
+          <div className="mb-2">
             <TextField
               select
               label=" Max Display Quantity"
               variant="outlined"
               fullWidth
               size="small"
+              InputProps={{
+                sx: {
+                  fontSize: "14px",
+                },
+              }}
               {...register("maxDisplayQty")}
               InputLabelProps={{ shrink: true }}
             >
@@ -275,13 +321,18 @@ export default function FormSection() {
             </TextField>
           </div>
 
-          <div>
+          <div className="mb-2">
             <TextField
               select
               label="Fan Area"
               variant="outlined"
               fullWidth
               size="small"
+              InputProps={{
+                sx: {
+                  fontSize: "14px",
+                },
+              }}
               {...register("fanArea")}
               InputLabelProps={{ shrink: true }}
             >
@@ -291,13 +342,18 @@ export default function FormSection() {
             </TextField>
           </div>
 
-          <div>
+          <div className="mb-2">
             <TextField
               select
               label="Category*"
               variant="outlined"
               fullWidth
               size="small"
+              InputProps={{
+                sx: {
+                  fontSize: "14px",
+                },
+              }}
               {...register("category", {
                 required: "Category is required",
               })}
@@ -311,13 +367,18 @@ export default function FormSection() {
             </TextField>
           </div>
 
-          <div>
+          <div className="mb-2">
             <TextField
               select
               label="Section/Block"
               variant="outlined"
               fullWidth
               size="small"
+              InputProps={{
+                sx: {
+                  fontSize: "14px",
+                },
+              }}
               {...register("sectionBlock")}
               InputLabelProps={{ shrink: true }}
             >
@@ -331,34 +392,49 @@ export default function FormSection() {
             </TextField>
           </div>
 
-          <div className="mb-4">
+          <div className="mb-2">
             <TextField
               label="Row"
               variant="outlined"
               fullWidth
               size="small"
+              InputProps={{
+                sx: {
+                  fontSize: "14px",
+                },
+              }}
               {...register("row")}
               InputLabelProps={{ shrink: true }}
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-2">
             <TextField
               label="First Seat"
               variant="outlined"
               fullWidth
               size="small"
+              InputProps={{
+                sx: {
+                  fontSize: "14px",
+                },
+              }}
               {...register("seating")}
               InputLabelProps={{ shrink: true }}
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-2">
             <TextField
               label="Face Value *"
               variant="outlined"
               fullWidth
               size="small"
+              InputProps={{
+                sx: {
+                  fontSize: "14px",
+                },
+              }}
               {...register("faceValue", {
                 valueAsNumber: true,
               })}
@@ -366,12 +442,17 @@ export default function FormSection() {
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-2">
             <TextField
               label="Payout Price *"
               variant="outlined"
               fullWidth
               size="small"
+              InputProps={{
+                sx: {
+                  fontSize: "14px",
+                },
+              }}
               {...register("payoutPrice", {
                 required: "Payout Price is required",
                 valueAsNumber: true,
@@ -389,6 +470,11 @@ export default function FormSection() {
               variant="outlined"
               fullWidth
               size="small"
+              InputProps={{
+                sx: {
+                  fontSize: "14px",
+                },
+              }}
               {...register("benefits")}
               InputLabelProps={{ shrink: true }}
             >
@@ -405,6 +491,11 @@ export default function FormSection() {
               variant="outlined"
               fullWidth
               size="small"
+              InputProps={{
+                sx: {
+                  fontSize: "14px",
+                },
+              }}
               {...register("restrictions")}
               InputLabelProps={{ shrink: true }}
             >
@@ -424,31 +515,31 @@ export default function FormSection() {
               error={!!errors.eventDate}
               helperText={errors.eventDate ? "Required" : ""}
               InputLabelProps={{ shrink: true }}
+              InputProps={{
+                sx: {
+                  fontSize: "14px",
+                },
+              }}
             />
           </div>
 
-          <div>
-            <div className="flex items-center border border-gray-300 rounded px-3 py-2 h-[38px] bg-white">
-              <FormControlLabel
-                control={
-                  <Checkbox {...register("ticketsInHand")} size="small" />
-                }
-                label=""
-              />
-              <input
-                type="text"
-                placeholder="Ticket in hand"
-                readOnly
-                className="flex-1 outline-none text-black bg-transparent border-none"
-              />
-            </div>
+          <div className="flex items-center border border-gray-300 rounded px-3 py-2 h-[38px] bg-white">
+            <FormControlLabel
+              control={<Checkbox {...register("ticketsInHand")} size="small" />}
+              label=""
+            />
+            <input
+              type="text"
+              placeholder="Ticket in hand"
+              readOnly
+              className="flex-1 text-sm outline-none text-black bg-transparent border-none"
+            />
           </div>
-
           <div>
             <label className="flex items-center justify-between w-full p-2 border border-gray-300 text-gray-500 rounded cursor-pointer bg-white hover:border-blue-500 h-[38px]">
               <span className="flex gap-5">
                 <FaUpload />
-                <span>Upload tickets</span>
+                <span className="text-sm">Upload tickets</span>
               </span>
               <input
                 type="file"
@@ -460,11 +551,10 @@ export default function FormSection() {
           </div>
         </div>
         <hr className="w-full text-gray-300" />
-
         <div className="flex justify-end mt-5">
           <button
             type="submit"
-            className=" w-40 bg-blue-800 text-white py-3 rounded-lg hover:bg-blue-900"
+            className="w-40 bg-blue-800 text-white py-3 rounded-lg hover:bg-blue-900"
           >
             + Add Listing
           </button>
